@@ -7,6 +7,20 @@ from rxconfig import config
 
 class State(rx.State):
     """The app state."""
+    title: str = "Like"
+    og_title:  str = "Like"
+    new_title: str = "Liked"
+    click_count: int = 0
+
+    @rx.event # event handler
+    def toggle_title(self):
+        if self.title == self.og_title:
+            self.title = self.new_title
+        else:
+            self.title = self.og_title
+        self.click_count += 1
+        print("Something happend")
+        
 
 
 def index() -> rx.Component:
@@ -14,12 +28,13 @@ def index() -> rx.Component:
     return rx.container(
         rx.color_mode.button(position="top-right"),
         rx.vstack(
-            rx.heading("Welcome to Reflex!", size="9"),
+            rx.heading(State.title, size="9"),
             rx.text(
-                "Get started by editing ",
-                rx.code(f"{config.app_name}/{config.app_name}.py"),
+                "Count: ",
+                State.click_count,
                 size="5",
             ),
+            rx.button("Click me", on_click=State.toggle_title),
             rx.link(
                 rx.button("Check out our docs!"),
                 href="https://reflex.dev/docs/getting-started/introduction/",
