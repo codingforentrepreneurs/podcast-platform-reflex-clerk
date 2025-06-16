@@ -1,13 +1,13 @@
 import reflex as rx
 from podcast_discovery import ui
 
-@rx.page("/contact")
-def contact_page() -> rx.Component:
+@rx.page("/about")
+def about_page() -> rx.Component:
     # Welcome Page (Index)
     return rx.container(
         rx.color_mode.button(position="top-right"),
         rx.vstack(
-           ui.page_heading("Contact Us"),
+            ui.page_heading("About"),
             rx.link(
                 rx.button("Home"),
                 href="/",
