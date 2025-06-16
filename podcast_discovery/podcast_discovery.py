@@ -1,6 +1,7 @@
 """Welcome to Reflex! This file outlines the steps to create a basic app."""
 
 import reflex as rx
+from podcast_discovery.pages import * # noqa -> importing pages to use them
 
 from rxconfig import config
 
@@ -48,24 +49,6 @@ def index() -> rx.Component:
     )
 
 
-def contact_page() -> rx.Component:
-    # Welcome Page (Index)
-    return rx.container(
-        rx.color_mode.button(position="top-right"),
-        rx.vstack(
-            rx.heading("Contact", size="9"),
-            rx.link(
-                rx.button("Home"),
-                href="/",
-                is_external=False,
-            ),
-            spacing="5",
-            justify="center",
-            min_height="85vh",
-        ),
-        rx.logo(),
-    )
 
 app = rx.App()
 app.add_page(index, route='/')
-app.add_page(contact_page, route="/contact")
