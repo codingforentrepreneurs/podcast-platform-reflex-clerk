@@ -1,6 +1,7 @@
 """Welcome to Reflex! This file outlines the steps to create a basic app."""
 
 import reflex as rx
+from podcast_discovery.contact import * # noqa -> importing pages to use them
 from podcast_discovery.pages import * # noqa -> importing pages to use them
 
 from rxconfig import config
