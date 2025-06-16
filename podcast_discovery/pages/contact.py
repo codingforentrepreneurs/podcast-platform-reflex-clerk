@@ -1,20 +1,11 @@
 import reflex as rx
 from podcast_discovery import ui
 
+from podcast_discovery.pages.layout import page_layout
+
 @rx.page("/contact")
 def contact_page() -> rx.Component:
-    # Welcome Page (Index)
-    return rx.container(
-        rx.color_mode.button(position="top-right"),
-        rx.vstack(
-           ui.page_heading("Contact Us"),
-            rx.link(
-                rx.button("Home"),
-                href="/",
-                is_external=False,
-            ),
-            spacing="5",
-            justify="center",
-            min_height="85vh",
-        ),
+    return page_layout(
+        rx.text("This is my contact page, I'll add to it later"),
+        title="Contact Page"
     )
