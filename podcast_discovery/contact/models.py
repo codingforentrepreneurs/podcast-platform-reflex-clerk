@@ -4,10 +4,6 @@ import reflex as rx
 from sqlmodel import Field
 import sqlalchemy
 
-# class ContactMessageCreate(rx.Model):
-#     name: str
-#     message: str
-
 class ContactMessageModel(rx.Model, table=True):
     name: str
     message: str

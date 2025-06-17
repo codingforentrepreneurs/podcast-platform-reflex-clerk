@@ -1,16 +1,19 @@
 from datetime import datetime
 import reflex as rx
 from podcast_discovery.contact.models import ContactMessageModel
-
+from podcast_discovery.contact.schemas import ContactMessageCreateSchema
+from pydantic import ValidationError
 
 class ContactFormState(rx.State):
     form_data: dict = {}
+    errors: dict = {}
     message: dict = {}
     has_error: bool = False
 
 
     def reset_form(self):
         self.has_error = False
+        self.errors = {}
         self.form_data = {}
 
     
@@ -26,12 +29,23 @@ class ContactFormState(rx.State):
         with rx.session() as session:
             # database session
             try:
-                instance = ContactMessageModel.model_validate(form_data)
-            except Exception as e:
-                print(e.errors())
+                model_data = ContactMessageCreateSchema.model_validate(form_data)
+            except ValidationError as e:
+                # Parse validation errors into a more user-friendly format
+                for err in e.errors():
+                    field_name = err['loc'][0] if err['loc'] else 'general'
+                    self.errors[field_name] = err['msg']
                 self.has_error = True
                 return
+            except Exception as e:
+                self.has_error = True
+                self.errors = {
+                    "general": f"An error occurred: {str(e)}"
+                }
+                return
             
+            # storing to db as is
+            instance = ContactMessageModel(**model_data.model_dump())
 
             # prepare to add to db
             session.add(instance)
@@ -60,8 +74,8 @@ def contact_form():
     return rx.vstack(
         rx.cond(
             ContactFormState.has_error, 
-            rx.text("true value or has_error is true", color="red"), 
-            "false"),
+            rx.text("There was a validation error, please try again.", color="red"), 
+            rx.fragment()),
         rx.form(
             rx.vstack(
                 rx.input(
