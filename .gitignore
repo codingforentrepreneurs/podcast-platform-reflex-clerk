@@ -4,3 +4,4 @@ __pycache__/
 assets/external/
 .web
 *.py[cod]
+.env
