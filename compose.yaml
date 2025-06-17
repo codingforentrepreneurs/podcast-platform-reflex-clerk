@@ -1,0 +1,19 @@
+services:
+ # DATABASE_URL=postgresql+psycopg://dbuser:db-password@db_service:5432/mydb
+  db_service:
+    image: postgres:17.5
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=db-password
+      - POSTGRES_DB=mydb
+    # env_file:
+    #   - .env.sample-db
+    volumes:
+      - db_service_vol:/var/lib/postgresql/data
+
+
+
+volumes:
+  db_service_vol:
