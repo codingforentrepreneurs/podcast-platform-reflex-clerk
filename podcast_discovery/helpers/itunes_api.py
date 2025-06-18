@@ -58,6 +58,7 @@ def podcast_search(
     offset: int = 0,
     entity: str = "podcastEpisode",
     attribute: str = "titleTerm",
+    sort_by_date: bool = False,
     verbose: bool = False,
 ):
     """
@@ -91,13 +92,15 @@ def podcast_search(
     response.raise_for_status()
 
     results = response.json().get("results", [])
-    return _filter_and_sort_results(results)
+    return _filter_and_sort_results(results, sort_by_date=sort_by_date)
 
 
-def _filter_and_sort_results(results):
+def _filter_and_sort_results(results, sort_by_date=True):
     """Helper function to filter and sort podcast episodes"""
-    return sorted(
-            [r for r in results if r.get("kind") == "podcast-episode"],
-            key=lambda x: x["releaseDate"],
-            reverse=True,
-        )
+    if sort_by_date:
+        return sorted(
+                [r for r in results if r.get("kind") == "podcast-episode"],
+                key=lambda x: x["releaseDate"],
+                reverse=True,
+            )
+    return [r for r in results if r.get("kind") == "podcast-episode"]
