@@ -1,6 +1,7 @@
 """Welcome to Reflex! This file outlines the steps to create a basic app."""
 
 import reflex as rx
+import reflex_clerk_api as reclerk
 from podcast_discovery.contact import * # noqa -> importing pages to use them
 from podcast_discovery.pages import * # noqa -> importing pages to use them
 
@@ -28,11 +29,16 @@ class State(rx.State):
 
 def index() -> rx.Component:
     # Welcome Page (Index)
+    welcome_message = rx.cond(
+        reclerk.ClerkState.is_signed_in, 
+        f"Welcome {reclerk.ClerkUser.first_name}!", 
+        State.title)
+     # bool
     return root_layout(
             rx.container(
 
                 rx.vstack(
-                    rx.heading(State.title, size="9"),
+                    rx.heading(welcome_message, size="9"),
                     rx.text(
                         "Count: ",
                         State.click_count,
