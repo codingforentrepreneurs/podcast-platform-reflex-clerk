@@ -2,7 +2,7 @@ import reflex as rx
 import reflex_clerk_api as reclerk
 from podcast_discovery.ui.nav import navbar
 
-from podcast_discovery import providers
+from podcast_discovery.ui.sidebar import user_sidebar
 
 
 def non_user_layout(child:rx.Component)-> rx.Component:
@@ -19,9 +19,11 @@ def non_user_layout(child:rx.Component)-> rx.Component:
 
 def user_layout(child:rx.Component)-> rx.Component:
 
-    return rx.container(
-            rx.fragment(child),
-            rx.logo(),
+    return rx.box(
+            rx.hstack(
+                user_sidebar(),
+                rx.fragment(child),
+            ),
             width="100%",
             id='my-root-layout'
         )

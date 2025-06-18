@@ -11,24 +11,10 @@ def page_layout(children: rx.Component, title: str =None) -> rx.Component:
                 rx.box(
                     children,
                 ),
-                rx.link(
-                    rx.button("Home"),
-                    href="/",
-                    is_external=False,
-                ),
-                rx.link(
-                    rx.button("Contact"),
-                    href="/contact",
-                    is_external=False,
-                ),
-                rx.link(
-                    rx.button("About"),
-                    href="/about",
-                    is_external=False,
-                ),
                 spacing="5",
                 justify="center",
                 min_height="85vh",
             ),
+           size="4"
         )
     )

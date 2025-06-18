@@ -57,6 +57,8 @@ def index() -> rx.Component:
                     min_height="85vh",
                 ),
 
+            size="4"
+
         )
     )
 
