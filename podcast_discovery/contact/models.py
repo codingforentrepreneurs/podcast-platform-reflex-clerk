@@ -7,7 +7,7 @@ import sqlalchemy
 class ContactMessageModel(rx.Model, table=True):
     name: str
     message: str
-    user_id: int | None = Field(default=None, index=True)
+    user_id: str | None = Field(default=None, index=True)
     created_at: datetime = Field(
         default_factory=datetime.now,
         sa_type=sqlalchemy.DateTime(timezone=False),

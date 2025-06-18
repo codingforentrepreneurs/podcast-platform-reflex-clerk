@@ -1,5 +1,6 @@
 from datetime import datetime
 import reflex as rx
+import reflex_clerk_api as reclerk
 from podcast_discovery.contact.models import ContactMessageModel
 from podcast_discovery.contact.schemas import ContactMessageCreateSchema
 from pydantic import ValidationError
@@ -24,8 +25,11 @@ class ContactFormState(rx.State):
         
 
     @rx.event
-    def handle_form_submit(self, form_data:dict):
+    async def handle_form_submit(self, form_data:dict):
         self.form_data = form_data
+        clerk_state = await self.get_state(reclerk.ClerkState)
+        # clerk_user = await self.get_state(reclerk.ClerkUser)
+        print('user_id', clerk_state.user_id)
         with rx.session() as session:
             # database session
             try:
@@ -46,6 +50,8 @@ class ContactFormState(rx.State):
             
             # storing to db as is
             instance = ContactMessageModel(**model_data.model_dump())
+            if clerk_state.user_id:
+                instance.user_id = clerk_state.user_id
 
             # prepare to add to db
             session.add(instance)
