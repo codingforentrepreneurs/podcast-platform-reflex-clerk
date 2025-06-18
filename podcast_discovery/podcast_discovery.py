@@ -9,6 +9,7 @@ from podcast_discovery import auth
 
 from rxconfig import config
 from podcast_discovery.layout import root_layout
+from podcast_discovery.podcasts.form import search_form
 
 
 class State(rx.State):
@@ -41,17 +42,7 @@ def index() -> rx.Component:
 
                 rx.vstack(
                     rx.heading(welcome_message, size="9"),
-                    rx.text(
-                        "Count: ",
-                        State.click_count,
-                        size="5",
-                    ),
-                    rx.button("Click me", on_click=State.toggle_title),
-                    rx.link(
-                        rx.button("Contact us!"),
-                        href="/contact",
-                        is_external=False,
-                    ),
+                    search_form(),
                     spacing="5",
                     justify="center",
                     min_height="85vh",

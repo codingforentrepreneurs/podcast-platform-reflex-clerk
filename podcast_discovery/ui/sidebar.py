@@ -29,7 +29,7 @@ def sidebar_item(
 
 def sidebar_items() -> rx.Component:
     return rx.vstack(
-        sidebar_item("Dashboard", "Dashboard", "/"),
+        sidebar_item("Dashboard", "layout_dashboard", "/"),
 
         sidebar_item("Contact", "mail", "/contact"),
         spacing="1",
