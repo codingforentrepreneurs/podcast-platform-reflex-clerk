@@ -1,3 +1,4 @@
 reflex==0.7.14
 psycopg[binary] # v3
 python-dotenv # python-decouple
+reflex-clerk-api
