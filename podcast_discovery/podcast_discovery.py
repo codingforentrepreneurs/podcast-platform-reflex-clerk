@@ -2,6 +2,7 @@
 
 import reflex as rx
 import reflex_clerk_api as reclerk
+from podcast_discovery.providers import my_clerk_provider_args
 from podcast_discovery.contact import * # noqa -> importing pages to use them
 from podcast_discovery.pages import * # noqa -> importing pages to use them
 from podcast_discovery import auth
@@ -62,6 +63,7 @@ def index() -> rx.Component:
 
 
 app = rx.App()
+reclerk.wrap_app(app, **my_clerk_provider_args)
 app.add_page(index, route='/')
 app.add_page(auth.login_page, route='/login')
 app.add_page(auth.signup_page, route='/signup')
