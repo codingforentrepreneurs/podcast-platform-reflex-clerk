@@ -4,6 +4,7 @@ import reflex as rx
 import reflex_clerk_api as reclerk
 from podcast_discovery.contact import * # noqa -> importing pages to use them
 from podcast_discovery.pages import * # noqa -> importing pages to use them
+from podcast_discovery import auth
 
 from rxconfig import config
 from podcast_discovery.layout import root_layout
@@ -62,3 +63,6 @@ def index() -> rx.Component:
 
 app = rx.App()
 app.add_page(index, route='/')
+app.add_page(auth.login_page, route='/login')
+app.add_page(auth.signup_page, route='/signup')
+app.add_page(auth.logout_page, route='/logout')

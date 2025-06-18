@@ -29,13 +29,13 @@ def navbar() -> rx.Component:
                     navbar_link("Contact", "/contact"),
                     rx.fragment(
                         reclerk.signed_out(
-                            reclerk.sign_in_button(rx.button("Sign in", variant="outline")),
-                            reclerk.sign_up_button(rx.button("Sign up")),
+                            rx.link(rx.button("Login", variant="outline"), href='/login'),
+                            rx.link(rx.button("Sign up"), href='/signup'),
                         )
                     ), 
                     rx.fragment(
                         reclerk.signed_in(
-                            reclerk.sign_out_button(rx.button("Logout")),
+                            rx.link(rx.button("Logout"), href='/logout'),
                         )
                     ),
                     justify="end",
