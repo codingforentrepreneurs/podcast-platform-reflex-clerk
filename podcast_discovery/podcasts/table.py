@@ -1,7 +1,8 @@
 import reflex as rx
 
+from .state import PodcastSearchState
 
-def search_table_row(data:dict):
+def search_table_row(data:dict) -> rx.Component:
 
     return rx.table.row(
                 rx.table.row_header_cell(data.get("title")),
@@ -10,7 +11,24 @@ def search_table_row(data:dict):
             )
 
 
-def search_results_table():
+def search_results_rows() -> rx.Component:
+    query_label = rx.cond(
+        PodcastSearchState.query, 
+        f"No results found for query {PodcastSearchState.query}",
+        "Search for a podcast episode"
+        )
+
+    return rx.cond(
+                PodcastSearchState.results,
+                rx.foreach(
+                    PodcastSearchState.results,
+                    search_table_row
+                ),
+                query_label
+            )
+
+
+def search_results_table() -> rx.Component:
 
     return rx.table.root(
         rx.table.header(
@@ -21,10 +39,12 @@ def search_results_table():
             ),
         ),
         rx.table.body(
-            rx.foreach(
-                [{"id": 123, "title": "My new title"}, {"id": 123, "title": "My new title"}],
-                search_table_row
+            rx.cond(
+                PodcastSearchState.loading,
+                rx.spinner(),
+                search_results_rows() 
             )
+            
         ),
         width="100%",
 )
