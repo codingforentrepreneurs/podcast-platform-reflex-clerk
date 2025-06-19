@@ -2,15 +2,20 @@ import reflex as rx
 
 from .players import podcast_audio_player, podcast_video_player
 from .schemas import PodcastEpisodeSchema
-from .state import PodcastSearchState, PodcastEpisodeState
+from .state import PodcastSearchState, PodcastEpisodeState, UserPodcastLikeState
 
 def search_table_row(podcast:PodcastEpisodeSchema) -> rx.Component:
     audio_el = podcast_audio_player(podcast.episode_url)
-    like_label = rx.cond(PodcastEpisodeState.liked, "Liked", "Like")
+    # "item " in []
+    like_button = rx.cond(
+        UserPodcastLikeState.liked_podcast_track_ids.contains(podcast.track_id), 
+        rx.button("Liked",  on_click=PodcastEpisodeState.user_did_toggle_like(podcast=podcast)),
+        rx.button("Like", variant='outline', on_click=PodcastEpisodeState.user_did_toggle_like(podcast=podcast)) 
+    )
     return rx.table.row(
                 rx.table.row_header_cell(
                     rx.hstack(
-                        rx.button(like_label, on_click=PodcastEpisodeState.user_did_toggle_like(podcast=podcast)),
+                        like_button,
                         rx.text(podcast.track_name)
                     )
                 ),
@@ -53,8 +58,8 @@ def search_results_table() -> rx.Component:
                 PodcastSearchState.loading,
                 rx.spinner(),
                 search_results_rows() 
-            )
-            
+            ),
+            on_mount=UserPodcastLikeState.handle_on_mount
         ),
         width="100%",
 )

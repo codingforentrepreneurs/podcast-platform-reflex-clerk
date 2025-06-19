@@ -2,6 +2,7 @@ from typing import List, Any
 import reflex as rx
 import reflex_clerk_api as reclerk
 from podcast_discovery import helpers
+from sqlmodel import select
 
 from .models import PodcastEpisode, PodcastLike
 from .schemas import PodcastEpisodeSchema, PodcastEpisodeRawAPISchema
@@ -26,7 +27,6 @@ class PodcastSearchState(rx.State):
         api_results = helpers.podcast_search(query, limit=100, attribute="descriptionTerm", sort_by_date=True)
         self.raw_results = api_results
         if len(api_results) > 0:
-            print(api_results[0].keys())
             final_results = []
             for x in api_results:
                 valid_data = PodcastEpisodeRawAPISchema.model_validate(x)
@@ -40,8 +40,6 @@ class PodcastSearchState(rx.State):
 
 
 class PodcastEpisodeState(rx.State):
-    liked: bool = False
-
     @rx.event
     async def user_did_toggle_like(self, podcast: PodcastEpisodeSchema):
         clerk_state = await self.get_state(reclerk.ClerkState)
@@ -54,14 +52,15 @@ class PodcastEpisodeState(rx.State):
                 session, 
                 track_id=data.get('track_id'), 
                 defaults=data)
-            is_liked, _ = PodcastLike.toggle_like(session, user_id, episode_instance.id)
-            self.liked = is_liked
-            print(f"{user_id} likes {is_liked} {episode_instance.track_name}")
+            PodcastLike.toggle_like(session, user_id, episode_instance.id)
+        # refresh a another state element
+        user_liked_podcast_state = await self.get_state(UserPodcastLikeState) 
+        await user_liked_podcast_state.handle_on_mount()
             
 
     @rx.event
     def user_did_interact(self, podcast: PodcastEpisodeSchema):
-        print(f"User did interact", podcast.track_name, podcast.track_id)
+        # print(f"User did interact", podcast.track_name, podcast.track_id)
         track_id = podcast.track_id
         defaults={
             "track_name": podcast.track_name,
@@ -73,10 +72,32 @@ class PodcastEpisodeState(rx.State):
             "artwork_url_600": podcast.artwork_url_600,
         }
         with rx.session() as session:
-            print("Update or create PodcastEpisode")
+            # print("Update or create PodcastEpisode")
             instance, _ = PodcastEpisode.update_or_create(session, 
                                             track_id=track_id, 
                                             defaults=defaults)
             instance.increment_interaction(session)
-            print('instance', instance.user_interactions)
+            # print('instance', instance.user_interactions)
             # PodcastEpisode
+
+
+class UserPodcastLikeState(rx.State):
+    liked_podcast_track_ids: List[int] = []
+
+    @rx.event
+    async def handle_on_mount(self):
+        clerk_state = await self.get_state(reclerk.ClerkState)
+        user_id = clerk_state.user_id
+        if not user_id:
+            return 
+        with rx.session() as session:
+            query = select(
+                PodcastEpisode.track_id
+            ).join(
+                PodcastLike,
+                PodcastLike.episode_id == PodcastEpisode.id
+            ).where(
+                PodcastLike.user_id == user_id
+            )
+            track_ids = session.exec(query).fetchall()
+            self.liked_podcast_track_ids = track_ids
