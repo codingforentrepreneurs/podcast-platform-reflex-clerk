@@ -2,15 +2,20 @@ import reflex as rx
 
 from .players import podcast_audio_player, podcast_video_player
 from .schemas import PodcastEpisodeSchema
-from .state import PodcastSearchState
+from .state import PodcastSearchState, PodcastEpisodeState
 
 def search_table_row(podcast:PodcastEpisodeSchema) -> rx.Component:
     audio_el = podcast_audio_player(podcast.episode_url)
     return rx.table.row(
-                rx.table.row_header_cell(podcast.track_name),
+                rx.table.row_header_cell(
+                    rx.hstack(
+                        rx.button("Like", on_click=PodcastEpisodeState.user_did_interact(podcast=podcast)),
+                        rx.text(podcast.track_name)
+                    )
+                ),
                 rx.table.cell(audio_el),
-                rx.table.cell(podcast.release_date),
-                rx.table.cell(podcast.collection_name),
+                rx.table.cell(podcast.release_date, on_click=PodcastEpisodeState.user_did_interact(podcast=podcast)),
+                rx.table.cell(podcast.collection_name, on_click=PodcastEpisodeState.user_did_interact(podcast=podcast)),
             )
 
 

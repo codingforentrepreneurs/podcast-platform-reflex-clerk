@@ -2,7 +2,7 @@ from typing import List, Any
 import reflex as rx
 from podcast_discovery import helpers
 
-from .schemas import PodcastEpisodeSchema
+from .schemas import PodcastEpisodeSchema, PodcastEpisodeRawAPISchema
 
 # key_mapping = {
 #     "trackName": "Title"
@@ -25,8 +25,20 @@ class PodcastSearchState(rx.State):
         self.raw_results = api_results
         if len(api_results) > 0:
             print(api_results[0].keys())
-            self.results = [PodcastEpisodeSchema(**x) for x in api_results]
+            final_results = []
+            for x in api_results:
+                valid_data = PodcastEpisodeRawAPISchema.model_validate(x)
+                final_data = PodcastEpisodeSchema(**valid_data.model_dump())
+                final_results.append(final_data)
+            self.results = final_results
             # self.columns = [key_mapping.get(y) for y in api_results[0].keys()]
         self.loading = False
         
         # call the search api
+
+
+class PodcastEpisodeState(rx.State):
+
+    @rx.event
+    def user_did_interact(self, podcast: PodcastEpisodeSchema):
+        print(f"User did interact", podcast.track_name, podcast.track_id)
