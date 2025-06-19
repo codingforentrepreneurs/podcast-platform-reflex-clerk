@@ -6,10 +6,11 @@ from .state import PodcastSearchState, PodcastEpisodeState
 
 def search_table_row(podcast:PodcastEpisodeSchema) -> rx.Component:
     audio_el = podcast_audio_player(podcast.episode_url)
+    like_label = rx.cond(PodcastEpisodeState.liked, "Liked", "Like")
     return rx.table.row(
                 rx.table.row_header_cell(
                     rx.hstack(
-                        rx.button("Like", on_click=PodcastEpisodeState.user_did_interact(podcast=podcast)),
+                        rx.button(like_label, on_click=PodcastEpisodeState.user_did_toggle_like(podcast=podcast)),
                         rx.text(podcast.track_name)
                     )
                 ),

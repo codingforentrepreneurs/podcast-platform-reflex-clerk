@@ -1,8 +1,9 @@
 from typing import List, Any
 import reflex as rx
+import reflex_clerk_api as reclerk
 from podcast_discovery import helpers
 
-from .models import PodcastEpisode
+from .models import PodcastEpisode, PodcastLike
 from .schemas import PodcastEpisodeSchema, PodcastEpisodeRawAPISchema
 
 # key_mapping = {
@@ -39,6 +40,24 @@ class PodcastSearchState(rx.State):
 
 
 class PodcastEpisodeState(rx.State):
+    liked: bool = False
+
+    @rx.event
+    async def user_did_toggle_like(self, podcast: PodcastEpisodeSchema):
+        clerk_state = await self.get_state(reclerk.ClerkState)
+        user_id = clerk_state.user_id
+        if not user_id:
+            return 
+        with rx.session() as session:
+            data = podcast.model_dump()
+            episode_instance, _ = PodcastEpisode.update_or_create(
+                session, 
+                track_id=data.get('track_id'), 
+                defaults=data)
+            is_liked, _ = PodcastLike.toggle_like(session, user_id, episode_instance.id)
+            self.liked = is_liked
+            print(f"{user_id} likes {is_liked} {episode_instance.track_name}")
+            
 
     @rx.event
     def user_did_interact(self, podcast: PodcastEpisodeSchema):

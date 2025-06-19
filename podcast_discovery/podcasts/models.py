@@ -1,6 +1,9 @@
 from datetime import datetime
+import sqlalchemy
 from sqlmodel import Field, Session, select, BigInteger
 import reflex as rx
+
+
 
 
 class PodcastEpisode(rx.Model, table=True):
@@ -50,3 +53,48 @@ class PodcastEpisode(rx.Model, table=True):
         session.commit()
         session.refresh(self)
         return self
+    
+
+class PodcastLike(rx.Model, table=True):
+    user_id: str = Field(default=None, index=True)
+    episode_id: int = Field(foreign_key="podcastepisode.id", index=True)
+    created_at: datetime = Field(
+        default_factory=datetime.now,
+        sa_type=sqlalchemy.DateTime(timezone=False),
+        sa_column_kwargs={
+            'server_default': sqlalchemy.func.now()
+        },
+        nullable=False
+    )
+
+    __table_args__ = (
+        sqlalchemy.UniqueConstraint('user_id', 'episode_id', name='unique_user_episode_like'),
+    )
+
+    @classmethod
+    def toggle_like(cls, session: Session, user_id: str, episode_id: int) -> tuple[bool, "PodcastLike | None"]:
+        query = select(PodcastLike).where(
+            PodcastLike.user_id == user_id,
+            PodcastLike.episode_id == episode_id
+        )
+        existing_like = session.exec(query).first()
+        
+        if existing_like:
+            session.delete(existing_like)
+            session.commit()
+            return False, None
+        
+        new_like = PodcastLike(user_id=user_id, episode_id=episode_id)
+        session.add(new_like)
+        session.commit()
+        session.refresh(new_like)
+        return True, new_like
+
+    @classmethod
+    def is_liked_by_user(PodcastLike, session: Session, user_id: str, episode_id: int) -> bool:
+        """Check if a specific episode is liked by a user"""
+        query = select(PodcastLike).where(
+            PodcastLike.user_id == user_id,
+            PodcastLike.episode_id == episode_id
+        )
+        return session.exec(query).first() is not None
