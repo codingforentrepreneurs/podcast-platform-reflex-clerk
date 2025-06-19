@@ -1,5 +1,6 @@
 import reflex as rx
 
+from .players import podcast_audio_player, podcast_video_player
 from .state import PodcastSearchState
 
 def search_table_row(data:dict) -> rx.Component:
@@ -15,9 +16,10 @@ def search_table_row(data:dict) -> rx.Component:
     'episodeContentType', 'artworkUrl160']
     
     """
+    audio_el = podcast_audio_player(data, key="episodeUrl")
     return rx.table.row(
                 rx.table.row_header_cell(data.get("trackName")),
-                rx.table.cell(data.get("episodeUrl")),
+                rx.table.cell(audio_el),
                 rx.table.cell(data.get("releaseDate")),
                 rx.table.cell(data.get("collectionName")),
             )
