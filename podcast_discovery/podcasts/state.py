@@ -4,8 +4,10 @@ import reflex_clerk_api as reclerk
 from podcast_discovery import helpers
 from sqlmodel import select
 
-from .models import PodcastEpisode, PodcastLike
-from .schemas import PodcastEpisodeSchema, PodcastEpisodeRawAPISchema
+from podcast_discovery.favorites.state import UserPodcastLikeState
+
+from podcast_discovery.podcasts.models import PodcastEpisode, PodcastLike
+from podcast_discovery.podcasts.schemas import PodcastEpisodeSchema, PodcastEpisodeRawAPISchema
 
 # key_mapping = {
 #     "trackName": "Title"
@@ -79,25 +81,3 @@ class PodcastEpisodeState(rx.State):
             instance.increment_interaction(session)
             # print('instance', instance.user_interactions)
             # PodcastEpisode
-
-
-class UserPodcastLikeState(rx.State):
-    liked_podcast_track_ids: List[int] = []
-
-    @rx.event
-    async def handle_on_mount(self):
-        clerk_state = await self.get_state(reclerk.ClerkState)
-        user_id = clerk_state.user_id
-        if not user_id:
-            return 
-        with rx.session() as session:
-            query = select(
-                PodcastEpisode.track_id
-            ).join(
-                PodcastLike,
-                PodcastLike.episode_id == PodcastEpisode.id
-            ).where(
-                PodcastLike.user_id == user_id
-            )
-            track_ids = session.exec(query).fetchall()
-            self.liked_podcast_track_ids = track_ids

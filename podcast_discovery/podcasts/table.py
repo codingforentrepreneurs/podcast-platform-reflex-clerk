@@ -1,10 +1,15 @@
 import reflex as rx
 
+from podcast_discovery.favorites.state import UserPodcastLikeState
+
+from podcast_discovery.podcasts.models import PodcastEpisode
+
 from .players import podcast_audio_player, podcast_video_player
 from .schemas import PodcastEpisodeSchema
-from .state import PodcastSearchState, PodcastEpisodeState, UserPodcastLikeState
+from .state import PodcastSearchState, PodcastEpisodeState 
 
-def search_table_row(podcast:PodcastEpisodeSchema) -> rx.Component:
+
+def podcast_search_results_table_row(podcast:PodcastEpisodeSchema | PodcastEpisode) -> rx.Component:
     audio_el = podcast_audio_player(podcast.episode_url)
     # "item " in []
     like_button = rx.cond(
@@ -36,7 +41,7 @@ def search_results_rows() -> rx.Component:
                 PodcastSearchState.results,
                 rx.foreach(
                     PodcastSearchState.results,
-                    search_table_row
+                    podcast_search_results_table_row
                 ),
                 query_label
             )
