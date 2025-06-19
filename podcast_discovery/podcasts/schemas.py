@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class PodcastEpisodeSchema(BaseModel):
-    track_id: int | str = Field(alias="trackId")
+    track_id: int = Field(alias="trackId")
     track_name: str = Field(alias="trackName")
     episode_url: str = Field(alias="episodeUrl")
     release_date: datetime = Field(alias="releaseDate")
