@@ -1,11 +1,10 @@
 import reflex as rx
 
 
-def podcast_audio_player(podcast_data:dict, key:str="episodeUrl"):
-    episode_url_value = podcast_data.get(key)
+def podcast_audio_player(episode_url:str = None,  width:str="150px", height:str="32px"):
     return rx.cond(
-        episode_url_value,
-        rx.audio(url=episode_url_value, width="150px", height="32px"),
+        episode_url,
+        rx.audio(url=episode_url, width="150px", height="32px"),
         "No audio found"
     )
 
