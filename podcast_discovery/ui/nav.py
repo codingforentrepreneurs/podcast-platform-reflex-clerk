@@ -23,7 +23,8 @@ def navbar() -> rx.Component:
                     align_items="center",
                 ),
                 rx.hstack(
-                    navbar_link("Home", "/#"),
+                    navbar_link("Home", "/"),
+                    navbar_link("Discover", "/discovery"),
                     navbar_link("About", "/about"),
                     navbar_link("Pricing", "/pricing"),
                     navbar_link("Contact", "/contact"),
