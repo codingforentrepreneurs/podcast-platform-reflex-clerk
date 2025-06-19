@@ -10,6 +10,7 @@ from podcast_discovery import auth
 from rxconfig import config
 from podcast_discovery.layout import root_layout
 from podcast_discovery.podcasts.form import search_form
+from podcast_discovery.podcasts.table import search_results_table
 
 
 class State(rx.State):
@@ -43,6 +44,7 @@ def index() -> rx.Component:
                 rx.vstack(
                     rx.heading(welcome_message, size="9"),
                     search_form(),
+                    search_results_table(),
                     spacing="5",
                     justify="center",
                     min_height="85vh",
