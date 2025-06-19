@@ -2,6 +2,7 @@ from typing import List, Any
 import reflex as rx
 from podcast_discovery import helpers
 
+from .models import PodcastEpisode
 from .schemas import PodcastEpisodeSchema, PodcastEpisodeRawAPISchema
 
 # key_mapping = {
@@ -42,3 +43,21 @@ class PodcastEpisodeState(rx.State):
     @rx.event
     def user_did_interact(self, podcast: PodcastEpisodeSchema):
         print(f"User did interact", podcast.track_name, podcast.track_id)
+        track_id = podcast.track_id
+        defaults={
+            "track_name": podcast.track_name,
+            "episode_url": podcast.episode_url,
+            "release_date": podcast.release_date,
+            "collection_name": podcast.collection_name,
+            "collection_id": podcast.collection_id,
+            "description": podcast.description,
+            "artwork_url_600": podcast.artwork_url_600,
+        }
+        with rx.session() as session:
+            print("Update or create PodcastEpisode")
+            instance, _ = PodcastEpisode.update_or_create(session, 
+                                            track_id=track_id, 
+                                            defaults=defaults)
+            instance.increment_interaction(session)
+            print('instance', instance.user_interactions)
+            # PodcastEpisode
